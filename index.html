@@ -195,10 +195,10 @@
 
     <script>
         // ============================================
-        // 1. CONFIGURATION - FILL THIS IN
+        // 1. CONFIGURATION
         // ============================================
         
-        // PASTE YOUR BIN ID HERE (e.g., "65a123...")
+        // PASTE YOUR NEW BIN ID HERE
         const BIN_ID = "69694945ae596e708fdef378"; 
         
         // ============================================
@@ -289,7 +289,6 @@
             if (itinerary.length > 0) {
                 const groups = {};
                 itinerary.forEach((event, idx) => {
-                    // Attach original index for editing
                     event.originalIndex = idx;
                     const d = new Date(event.isoDate);
                     const dayKey = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
@@ -300,6 +299,9 @@
                 const startDate = new Date(itinerary[0].isoDate);
                 const endDate = new Date(itinerary[itinerary.length - 1].isoDate);
                 
+                // TRACK LOCATION
+                let currentContextLocation = itinerary[0].location || "Transit";
+
                 for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
                     const currentDayKey = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
                     const eventsForDay = groups[currentDayKey];
@@ -307,6 +309,9 @@
                     let dayHtml = `<div class="day-group"><div class="day-header">${currentDayKey}</div>`;
 
                     if (eventsForDay && eventsForDay.length > 0) {
+                        // We have events: Update location to the LAST event of this day
+                        currentContextLocation = eventsForDay[eventsForDay.length - 1].location;
+
                         eventsForDay.forEach(ev => {
                             const isMinor = ev.onlyDayView ? 'minor' : '';
                             const mapLink = `https://maps.google.com/?q=${encodeURIComponent(ev.location)}`;
@@ -331,7 +336,8 @@
                             `;
                         });
                     } else {
-                        dayHtml += `<div class="day-card empty">No planned activities</div>`;
+                        // NO EVENTS: Use Last Known Location
+                        dayHtml += `<div class="day-card empty">Free day in ${currentContextLocation}</div>`;
                     }
                     dayHtml += `</div>`;
                     dayviewRoot.insertAdjacentHTML('beforeend', dayHtml);
@@ -350,7 +356,6 @@
                 document.getElementById('body').classList.remove('editing-mode');
                 document.getElementById('admin-btn').innerHTML = '<i class="fas fa-lock"></i>';
             } else {
-                // Ask for password (API Key) if not stored
                 if(!apiKey) {
                     const input = prompt("Enter the Master Key (Password):");
                     if(!input) return;
@@ -365,18 +370,17 @@
 
         function openModal(index = null) {
             const modal = document.getElementById('editModal');
-            document.getElementById('edit-index').value = index !== null ? index : "-1"; // -1 means new
+            document.getElementById('edit-index').value = index !== null ? index : "-1"; 
 
             if (index !== null && itinerary[index]) {
                 const ev = itinerary[index];
                 document.getElementById('edit-title').value = ev.title;
-                document.getElementById('edit-date').value = ev.isoDate; // Format needs to match datetime-local?
+                document.getElementById('edit-date').value = ev.isoDate; 
                 document.getElementById('edit-location').value = ev.location;
                 document.getElementById('edit-image').value = ev.image || "";
                 document.getElementById('edit-details').value = ev.details;
                 document.getElementById('edit-minor').checked = ev.onlyDayView || false;
             } else {
-                // Clear for new
                 document.getElementById('edit-title').value = "";
                 document.getElementById('edit-date').value = "";
                 document.getElementById('edit-location').value = "";
@@ -407,7 +411,6 @@
                 return;
             }
 
-            // Update Local State
             if(index === -1) {
                 itinerary.push(newEvent);
             } else {
@@ -415,8 +418,8 @@
             }
 
             closeModal();
-            renderApp(); // Update UI immediately
-            await syncToCloud(); // Save to JSONBin
+            renderApp(); 
+            await syncToCloud(); 
         }
 
         async function deleteEvent(index) {
@@ -429,7 +432,7 @@
 
         async function syncToCloud() {
             const btn = document.getElementById('admin-btn');
-            btn.style.color = 'yellow'; // Indicate saving
+            btn.style.color = 'yellow'; 
 
             try {
                 const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, {
@@ -442,16 +445,15 @@
                 });
 
                 if(!response.ok) throw new Error("Failed to save");
-                btn.style.color = 'lightgreen'; // Success
+                btn.style.color = 'lightgreen'; 
                 setTimeout(() => { btn.style.color = 'white'; }, 2000);
             } catch(e) {
                 alert("Error saving to cloud! Check your Password/API Key.");
-                apiKey = ""; // Reset key if it failed
+                apiKey = ""; 
                 localStorage.removeItem('trip_api_key');
             }
         }
 
-        // Helpers
         function switchTab(tabName) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
