@@ -100,7 +100,7 @@
 
         /* --- DOCS VIEW --- */
         .drive-container {
-            width: 100%; height: 500px; border: none; border-radius: 10px;
+            width: 100%; height: 600px; border: none; border-radius: 10px;
             background: white; box-shadow: 0 4px 15px rgba(0,0,0,0.1); margin-bottom: 30px;
         }
         .doc-card {
@@ -126,6 +126,19 @@
         .toggle-btn.active {
             background: var(--primary-color); color: white;
         }
+        
+        .safe-launch-box {
+            background: white; border-radius: 10px; padding: 40px; text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+        .launch-btn {
+            display: inline-block; background: var(--accent-color); color: white;
+            padding: 15px 30px; border-radius: 30px; text-decoration: none;
+            font-weight: bold; font-size: 1.1rem; margin-top: 20px;
+            box-shadow: 0 4px 10px rgba(230, 126, 34, 0.4);
+            transition: transform 0.2s;
+        }
+        .launch-btn:hover { transform: translateY(-3px); }
 
         /* --- EDITING UI --- */
         #admin-btn {
@@ -215,10 +228,14 @@
         </div>
 
         <div id="upload-mode" style="display:none;">
-             <div id="form-placeholder" style="text-align:center; padding:40px; background:white; border-radius:10px;">
-                <p>Upload Form URL not set.</p>
+             <div class="safe-launch-box">
+                <i class="fas fa-cloud-upload-alt" style="font-size: 50px; color: #2c3e50; margin-bottom: 20px;"></i>
+                <h3>Upload to Secure Drive</h3>
+                <p style="color: #666; max-width: 400px; margin: 0 auto;">
+                    For security reasons, Google requires file uploads to happen in a secure window. Click below to open the upload form.
+                </p>
+                <a id="upload-btn-link" href="#" target="_blank" class="launch-btn">Open Upload Form</a>
             </div>
-            <iframe id="form-frame" class="drive-container" src="" style="display:none; height:700px;"></iframe>
         </div>
     </div>
 
@@ -287,19 +304,17 @@
             throw new Error("Access Denied"); 
         }
 
-        // 2. SETUP IFRAMES
+        // 2. SETUP VIEWS
         if (DRIVE_FOLDER_ID) {
             const iframe = document.getElementById('drive-frame');
-            iframe.src = `https://drive.google.com/embeddedfolderview?id=${DRIVE_FOLDER_ID}#list`;
+            // Changed #list to #grid for thumbnails
+            iframe.src = `https://drive.google.com/embeddedfolderview?id=${DRIVE_FOLDER_ID}#grid`;
             iframe.style.display = "block";
             document.getElementById('drive-placeholder').style.display = "none";
         }
 
         if (UPLOAD_FORM_URL) {
-            const formFrame = document.getElementById('form-frame');
-            formFrame.src = UPLOAD_FORM_URL;
-            formFrame.style.display = "block";
-            document.getElementById('form-placeholder').style.display = "none";
+            document.getElementById('upload-btn-link').href = UPLOAD_FORM_URL;
         }
 
         // 3. LOAD DATA
@@ -460,7 +475,7 @@
         }
 
         // ============================================
-        // UI LOGIC
+        // UI & EDIT LOGIC
         // ============================================
 
         function switchTab(tabName) {
@@ -470,7 +485,6 @@
             
             document.getElementById(tabName).classList.add('active');
             
-            // Toggle highlight
             const btns = document.querySelectorAll('.tab-btn');
             if(tabName === 'timeline') btns[0].classList.add('active');
             else if(tabName === 'dayview') btns[1].classList.add('active');
