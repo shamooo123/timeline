@@ -115,6 +115,18 @@
             border-radius: 5px; text-decoration: none; font-size: 0.9rem; 
         }
 
+        /* --- UPLOAD SECTION --- */
+        .upload-toggle {
+            display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;
+        }
+        .toggle-btn {
+            padding: 8px 20px; border: 1px solid var(--primary-color); background: white;
+            color: var(--primary-color); border-radius: 20px; cursor: pointer; font-weight: bold;
+        }
+        .toggle-btn.active {
+            background: var(--primary-color); color: white;
+        }
+
         /* --- EDITING UI --- */
         #admin-btn {
             position: fixed; top: 20px; right: 20px; background: rgba(0,0,0,0.5); color: white;
@@ -185,15 +197,29 @@
 
     <div id="docs" class="view-section">
         <h2 style="text-align:center; color:#2c3e50;">Trip Documents</h2>
-        
-        <div id="drive-placeholder" style="text-align:center; padding:20px; background:white; border-radius:10px; margin-bottom:20px;">
-            <p>Google Drive Folder not connected.</p>
-        </div>
-        <iframe id="drive-frame" class="drive-container" src="" style="display:none;"></iframe>
 
-        <h3 style="margin-top:30px;">Pinned Links</h3>
-        <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">Use the + button to add specific file links here.</p>
-        <div id="docs-root"></div>
+        <div class="upload-toggle">
+            <button class="toggle-btn active" onclick="toggleDocsView('view')">View Files</button>
+            <button class="toggle-btn" onclick="toggleDocsView('upload')">Upload New</button>
+        </div>
+        
+        <div id="view-mode">
+            <div id="drive-placeholder" style="text-align:center; padding:20px; background:white; border-radius:10px; margin-bottom:20px;">
+                <p>Google Drive Folder not connected.</p>
+            </div>
+            <iframe id="drive-frame" class="drive-container" src="" style="display:none;"></iframe>
+
+            <h3 style="margin-top:30px;">Pinned Links</h3>
+            <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">Specific important files pinned for quick access.</p>
+            <div id="docs-root"></div>
+        </div>
+
+        <div id="upload-mode" style="display:none;">
+             <div id="form-placeholder" style="text-align:center; padding:40px; background:white; border-radius:10px;">
+                <p>Upload Form URL not set.</p>
+            </div>
+            <iframe id="form-frame" class="drive-container" src="" style="display:none; height:700px;"></iframe>
+        </div>
     </div>
 
     <button id="add-btn" onclick="openModal()"><i class="fas fa-plus"></i></button>
@@ -241,11 +267,11 @@
         
         const SITE_PASSWORD = "abbasi786";
         const BIN_ID = "69694945ae596e708fdef378"; 
-        const DRIVE_FOLDER_ID = "1BjK_06jN6ld7_D851W7H4N6h5Pvg1Ar6"; // PASTE YOUR GOOGLE DRIVE FOLDER ID HERE
+        const DRIVE_FOLDER_ID = "1BjK_06jN6ld7_D851W7H4N6h5Pvg1Ar6";
+        const UPLOAD_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSftpSlJEVa-hqXL_9e8hCITG4ue5286XpJGa1_rwVbT8ddzCQ/viewform?usp=header"; // <-- PASTE YOUR GOOGLE FORM LINK HERE
         
         // ============================================
         
-        // Data Structure: { events: [], docs: [] }
         let tripData = { events: [], docs: [] };
         let isEditMode = false;
         let apiKey = localStorage.getItem('trip_api_key') || "";
@@ -258,15 +284,22 @@
         } else {
             document.body.innerHTML = "<div style='display:flex;height:100vh;justify-content:center;align-items:center;flex-direction:column;'><h1>🚫 Access Denied</h1><p>Incorrect password.</p><button onclick='location.reload()' style='padding:10px 20px;margin-top:20px;'>Try Again</button></div>";
             document.body.style.display = "flex";
-            throw new Error("Access Denied"); // Stop script execution
+            throw new Error("Access Denied"); 
         }
 
-        // 2. SETUP DRIVE IFRAME
+        // 2. SETUP IFRAMES
         if (DRIVE_FOLDER_ID) {
             const iframe = document.getElementById('drive-frame');
             iframe.src = `https://drive.google.com/embeddedfolderview?id=${DRIVE_FOLDER_ID}#list`;
             iframe.style.display = "block";
             document.getElementById('drive-placeholder').style.display = "none";
+        }
+
+        if (UPLOAD_FORM_URL) {
+            const formFrame = document.getElementById('form-frame');
+            formFrame.src = UPLOAD_FORM_URL;
+            formFrame.style.display = "block";
+            document.getElementById('form-placeholder').style.display = "none";
         }
 
         // 3. LOAD DATA
@@ -279,14 +312,12 @@
                 const response = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`);
                 const data = await response.json();
                 
-                // MIGRATION LOGIC: If old format (array), convert to new object
                 if (Array.isArray(data.record)) {
                     tripData = { events: data.record, docs: [] };
                 } else {
                     tripData = data.record;
                 }
                 
-                // Ensure arrays exist
                 if(!tripData.events) tripData.events = [];
                 if(!tripData.docs) tripData.docs = [];
 
@@ -303,7 +334,6 @@
             renderDocs();
         }
 
-        // --- RENDER TIMELINE & DAY VIEW (Same as before) ---
         function renderTimeline() {
             const now = new Date();
             const root = document.getElementById('timeline-root');
@@ -430,7 +460,7 @@
         }
 
         // ============================================
-        // UI & EDIT LOGIC
+        // UI LOGIC
         // ============================================
 
         function switchTab(tabName) {
@@ -440,11 +470,26 @@
             
             document.getElementById(tabName).classList.add('active');
             
-            // Highlight correct tab button
+            // Toggle highlight
             const btns = document.querySelectorAll('.tab-btn');
             if(tabName === 'timeline') btns[0].classList.add('active');
             else if(tabName === 'dayview') btns[1].classList.add('active');
             else btns[2].classList.add('active');
+        }
+
+        function toggleDocsView(mode) {
+            const btns = document.querySelectorAll('.toggle-btn');
+            if(mode === 'view') {
+                document.getElementById('view-mode').style.display = 'block';
+                document.getElementById('upload-mode').style.display = 'none';
+                btns[0].classList.add('active');
+                btns[1].classList.remove('active');
+            } else {
+                document.getElementById('view-mode').style.display = 'none';
+                document.getElementById('upload-mode').style.display = 'block';
+                btns[0].classList.remove('active');
+                btns[1].classList.add('active');
+            }
         }
 
         function toggleEditMode() {
@@ -466,7 +511,6 @@
         }
 
         function openModal(index = -1, type = null) {
-            // Auto-detect type based on tab if not provided
             if (!type) type = currentTab === 'docs' ? 'doc' : 'event';
             
             const modal = document.getElementById('editModal');
@@ -474,7 +518,6 @@
             document.getElementById('edit-type').value = type;
             document.getElementById('modal-title').innerText = index === -1 ? `Add New ${type}` : `Edit ${type}`;
 
-            // Toggle Fields
             if (type === 'event') {
                 document.getElementById('event-fields').style.display = 'block';
                 document.getElementById('doc-fields').style.display = 'none';
@@ -523,7 +566,6 @@
                     onlyDayView: document.getElementById('edit-minor').checked
                 };
                 if(!newEvent.title || !newEvent.isoDate) return alert("Title & Date required!");
-                
                 if(index === -1) tripData.events.push(newEvent);
                 else tripData.events[index] = newEvent;
 
@@ -534,7 +576,6 @@
                     notes: document.getElementById('doc-notes').value
                 };
                 if(!newDoc.title || !newDoc.link) return alert("Title & Link required!");
-
                 if(index === -1) tripData.docs.push(newDoc);
                 else tripData.docs[index] = newDoc;
             }
@@ -548,7 +589,6 @@
             if(confirm("Delete this item?")) {
                 if(type === 'event') tripData.events.splice(index, 1);
                 else tripData.docs.splice(index, 1);
-                
                 renderApp();
                 await syncToCloud();
             }
