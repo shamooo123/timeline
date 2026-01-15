@@ -60,7 +60,6 @@
             top: 0; bottom: 0; left: 50%; margin-left: -2px;
         }
 
-        /* PAST & NOW STYLES */
         .container.past .content { filter: grayscale(100%); opacity: 0.6; }
         .container.past::after { background-color: #ddd; border-color: #999; }
         
@@ -73,7 +72,6 @@
             content: ''; height: 2px; background: #e74c3c; flex-grow: 1; margin: 0 10px;
         }
 
-        /* CARD STYLES */
         .container { padding: 10px 40px; position: relative; width: 50%; box-sizing: border-box; }
         .left { left: 0; } .right { left: 50%; }
         .container::after {
@@ -96,7 +94,6 @@
         .details { max-height: 0; opacity: 0; transition: 0.4s ease; margin-top: 0; padding-top: 0; border-top: 1px solid transparent; }
         .content.active .details { max-height: 500px; opacity: 1; margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; }
 
-        /* --- DAY VIEW STYLES --- */
         .day-group { margin-bottom: 40px; }
         .day-header {
             background: #dfe6e9; padding: 10px 15px; border-radius: 8px;
@@ -111,7 +108,6 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         
-        /* Minor Events */
         .day-card.minor {
             background: #fff; border-left: 4px solid #bdc3c7;
             margin-left: 20px; padding: 10px 15px;
@@ -148,113 +144,22 @@
         <div id="dayview-root"></div>
     </div>
 
+    <script src="itinerary.js"></script>
+
     <script>
-        /* DATA ENTRY
-           I have estimated 2026 dates and random times.
-           Update 'isoDate' with real times later to correct the order.
+        /* NOTE: The 'itinerary' variable is now loaded from itinerary.js 
+           This script just handles the display logic.
         */
-        const itinerary = [
-            // --- DEPARTURE ---
-            {
-                isoDate: "2026-07-13T10:00:00", 
-                displayDate: "July 13",
-                title: "Fly to Kuala Lumpur",
-                location: "Departure Airport",
-                image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=150&h=150&fit=crop", 
-                details: "Departure day! Check passports and bags."
-            },
-            
-            // --- KUALA LUMPUR (14-16 July) ---
-            {
-                isoDate: "2026-07-14T14:00:00", 
-                displayDate: "July 14",
-                title: "Arrive in Malaysia",
-                location: "Kuala Lumpur (KUL)",
-                image: "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=150&h=150&fit=crop", 
-                details: "Start of the 3 night stay in KL. Head to hotel to check in."
-            },
-            {
-                onlyDayView: true,
-                isoDate: "2026-07-14T16:00:00",
-                displayDate: "July 14",
-                title: "Check-in Hotel KL",
-                location: "Hotel Name TBC",
-                details: "Need to confirm booking reference."
-            },
 
-            // --- SINGAPORE (17-19 July) ---
-            {
-                isoDate: "2026-07-17T11:00:00", 
-                displayDate: "July 17",
-                title: "Fly to Singapore",
-                location: "Changi Airport",
-                image: "https://images.unsplash.com/photo-1565967511849-76a60a516170?w=150&h=150&fit=crop", 
-                details: "Short flight to Singapore. Stay for 2 nights."
-            },
-            {
-                onlyDayView: true,
-                isoDate: "2026-07-17T14:00:00",
-                displayDate: "July 17",
-                title: "Check-in Singapore",
-                location: "Hotel Name TBC",
-                details: "2 Nights stay."
-            },
-
-            // --- PHUKET (19-23 July) ---
-            {
-                isoDate: "2026-07-19T10:00:00", 
-                displayDate: "July 19",
-                title: "Fly to Phuket",
-                location: "Phuket International",
-                image: "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=150&h=150&fit=crop", 
-                details: "Heading to the beach! 5 Night stay."
-            },
-            {
-                onlyDayView: true,
-                isoDate: "2026-07-19T15:00:00",
-                displayDate: "July 19",
-                title: "Check-in Resort",
-                location: "Resort Name TBC",
-                details: "Relax and unwind."
-            },
-
-            // --- BANGKOK (24-26 July) ---
-            {
-                isoDate: "2026-07-24T12:00:00", 
-                displayDate: "July 24",
-                title: "Fly to Bangkok",
-                location: "Suvarnabhumi Airport",
-                image: "https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=150&h=150&fit=crop", 
-                details: "City break for the final leg."
-            },
-             {
-                onlyDayView: true,
-                isoDate: "2026-07-24T15:00:00",
-                displayDate: "July 24",
-                title: "Check-in Bangkok",
-                location: "Hotel Name TBC",
-                details: "2 Nights stay."
-            },
-
-            // --- HOME ---
-            {
-                isoDate: "2026-07-26T18:00:00", 
-                displayDate: "July 26",
-                title: "Fly Home",
-                location: "Airport",
-                image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=150&h=150&fit=crop", 
-                details: "End of the trip. Safe travels!"
-            }
-        ];
-
-        // --- RENDER LOGIC ---
         const now = new Date();
         const timelineRoot = document.getElementById('timeline-root');
         const dayviewRoot = document.getElementById('dayview-root');
         let nowMarkerPlaced = false;
 
+        // Sort Data
         itinerary.sort((a, b) => new Date(a.isoDate) - new Date(b.isoDate));
 
+        // Render Timeline
         let visibleCount = 0;
         itinerary.forEach((event) => {
             if (event.onlyDayView) return; 
@@ -288,6 +193,7 @@
             visibleCount++;
         });
 
+        // Render Day View
         const groups = {};
         itinerary.forEach(event => {
             const dayKey = event.displayDate.split(' - ')[0]; 
