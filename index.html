@@ -90,16 +90,21 @@
         .thumbnail { width: 50px; height: 50px; object-fit: cover; border-radius: 50%; flex-shrink: 0; }
         .date-badge { background: var(--primary-color); color: white; padding: 3px 8px; border-radius: 10px; font-size: 0.7rem; }
         h2 { margin: 0; font-size: 1.1rem; }
-        .location-link { color: var(--accent-color); text-decoration: none; font-size: 0.85rem; display: block; }
+        
+        /* Location text in timeline (No longer a link) */
+        .location-text { color: #7f8c8d; font-size: 0.85rem; display: block; font-weight: 500; }
+        
         .details { max-height: 0; opacity: 0; transition: 0.4s ease; margin-top: 0; padding-top: 0; border-top: 1px solid transparent; }
         .content.active .details { max-height: 500px; opacity: 1; margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; }
 
+        /* --- DAY VIEW STYLES --- */
         .day-group { margin-bottom: 40px; }
         .day-header {
             background: #dfe6e9; padding: 10px 15px; border-radius: 8px;
             font-weight: bold; color: var(--primary-color); margin-bottom: 15px;
             position: sticky; top: 0; z-index: 5;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-left: 5px solid var(--primary-color);
         }
         
         .day-card {
@@ -108,12 +113,30 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         
+        /* Empty Day Styling */
+        .day-card.empty {
+            border-left: 4px solid #bdc3c7;
+            background: repeating-linear-gradient(
+                45deg,
+                #f9f9f9,
+                #f9f9f9 10px,
+                #ffffff 10px,
+                #ffffff 20px
+            );
+            color: #95a5a6;
+            font-style: italic;
+        }
+
         .day-card.minor {
             background: #fff; border-left: 4px solid #bdc3c7;
             margin-left: 20px; padding: 10px 15px;
         }
         .day-card.minor strong { font-weight: 500; color: #555; }
         .day-card.minor .sub-text { font-size: 0.85rem; color: #777; }
+        
+        /* Links in Day View */
+        .day-card a { color: var(--accent-color); font-weight: bold; text-decoration: none; }
+        .day-card a:hover { text-decoration: underline; }
 
         @media screen and (max-width: 768px) {
             .timeline::after { left: 30px; }
@@ -147,19 +170,15 @@
     <script src="itinerary.js"></script>
 
     <script>
-        /* NOTE: The 'itinerary' variable is now loaded from itinerary.js 
-           This script just handles the display logic.
-        */
-
         const now = new Date();
         const timelineRoot = document.getElementById('timeline-root');
         const dayviewRoot = document.getElementById('dayview-root');
         let nowMarkerPlaced = false;
 
-        // Sort Data
+        // Ensure data is sorted
         itinerary.sort((a, b) => new Date(a.isoDate) - new Date(b.isoDate));
 
-        // Render Timeline
+        // --- 1. RENDER TIMELINE (Compressed, No Map Links) ---
         let visibleCount = 0;
         itinerary.forEach((event) => {
             if (event.onlyDayView) return; 
@@ -167,13 +186,13 @@
             const eventDate = new Date(event.isoDate);
             const isPast = eventDate < now;
             const side = visibleCount % 2 === 0 ? 'left' : 'right';
-            const mapLink = `https://maps.google.com/?q=${encodeURIComponent(event.location)}`;
             
             if (!nowMarkerPlaced && eventDate > now) {
                 timelineRoot.insertAdjacentHTML('beforeend', `<div class="now-marker">CURRENT TIME</div>`);
                 nowMarkerPlaced = true;
             }
 
+            // Note: Changed <a> to <span> for location to improve mobile expanding
             const html = `
                 <div class="container ${side} ${isPast ? 'past' : ''}">
                     <div class="content" onclick="this.classList.toggle('active')">
@@ -182,7 +201,7 @@
                             <div>
                                 <span class="date-badge">${event.displayDate}</span>
                                 <h2>${event.title}</h2>
-                                <a href="${mapLink}" target="_blank" class="location-link" onclick="event.stopPropagation()">📍 ${event.location}</a>
+                                <span class="location-text">📍 ${event.location}</span>
                             </div>
                         </div>
                         <div class="details"><p>${event.details}</p></div>
@@ -193,35 +212,65 @@
             visibleCount++;
         });
 
-        // Render Day View
+        // --- 2. RENDER DAY VIEW (Full Dates, Clickable Links) ---
+        
+        // Group existing events by Date Key (e.g. "July 13")
         const groups = {};
         itinerary.forEach(event => {
-            const dayKey = event.displayDate.split(' - ')[0]; 
+            // Create a consistent key from the ISO date to match the loop below
+            const d = new Date(event.isoDate);
+            const dayKey = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
             if (!groups[dayKey]) groups[dayKey] = [];
             groups[dayKey].push(event);
         });
 
-        for (const [day, events] of Object.entries(groups)) {
-            let dayHtml = `<div class="day-group"><div class="day-header">${day}</div>`;
-            events.forEach(ev => {
-                const isMinor = ev.onlyDayView ? 'minor' : '';
-                const mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.location)}`;
-                dayHtml += `
-                    <div class="day-card ${isMinor}">
-                        <div style="display:flex; justify-content:space-between; align-items:center;">
-                            <strong>${ev.title}</strong>
-                            <small class="sub-text">${ev.isoDate.split('T')[1].substring(0,5)}</small>
+        // Determine Trip Start and End Dates from data
+        if (itinerary.length > 0) {
+            const startDate = new Date(itinerary[0].isoDate);
+            const endDate = new Date(itinerary[itinerary.length - 1].isoDate);
+            
+            // Loop through every single day from Start to End
+            for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                
+                const currentDayKey = d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
+                const eventsForDay = groups[currentDayKey];
+
+                // Start HTML for this day
+                let dayHtml = `<div class="day-group"><div class="day-header">${currentDayKey}</div>`;
+
+                if (eventsForDay && eventsForDay.length > 0) {
+                    // Render Events
+                    eventsForDay.forEach(ev => {
+                        const isMinor = ev.onlyDayView ? 'minor' : '';
+                        // Map link included here for Day View
+                        const mapLink = `https://maps.google.com/?q=${encodeURIComponent(ev.location)}`;
+                        
+                        dayHtml += `
+                            <div class="day-card ${isMinor}">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <strong>${ev.title}</strong>
+                                    <small class="sub-text">${ev.isoDate.split('T')[1].substring(0,5)}</small>
+                                </div>
+                                <div class="sub-text" style="margin-top:5px;">
+                                    <a href="${mapLink}" target="_blank">📍 ${ev.location}</a>
+                                    <br>
+                                    <span style="display:block; margin-top:5px;">${ev.details}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    // Render Empty State
+                    dayHtml += `
+                        <div class="day-card empty">
+                            No planned activities (Free Day)
                         </div>
-                        <div class="sub-text" style="margin-top:5px;">
-                            <a href="${mapLink}" style="color:#e67e22; text-decoration:none;">📍 ${ev.location}</a>
-                            <br>
-                            ${ev.details}
-                        </div>
-                    </div>
-                `;
-            });
-            dayHtml += `</div>`;
-            dayviewRoot.insertAdjacentHTML('beforeend', dayHtml);
+                    `;
+                }
+
+                dayHtml += `</div>`; // Close day-group
+                dayviewRoot.insertAdjacentHTML('beforeend', dayHtml);
+            }
         }
 
         function switchTab(tabName) {
