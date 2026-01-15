@@ -10,6 +10,7 @@
             --accent-color: #e67e22; 
             --bg-color: #f4f7f6;
             --card-bg: #ffffff;
+            --past-color: #95a5a6;
         }
 
         body {
@@ -17,144 +18,139 @@
             background-color: var(--bg-color);
             color: #333;
             margin: 0;
-            padding: 0; /* Changed for Banner */
+            padding: 0 0 80px 0; /* Padding for bottom nav */
         }
 
-        /* NEW: Hero Banner */
+        /* --- NAVIGATION TABS (Fixed Bottom on Mobile) --- */
+        .nav-tabs {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: white;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            z-index: 1000;
+            height: 60px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            border: none;
+            background: none;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #7f8c8d;
+            cursor: pointer;
+            border-top: 4px solid transparent;
+            transition: 0.3s;
+        }
+
+        .tab-btn.active {
+            color: var(--primary-color);
+            border-top: 4px solid var(--accent-color);
+            background-color: #fbfbfb;
+        }
+
+        /* --- HERO BANNER --- */
         .hero {
-            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1200');
+            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1200');
             background-size: cover;
             background-position: center;
             color: white;
             text-align: center;
-            padding: 60px 20px;
-            margin-bottom: 40px;
+            padding: 50px 20px;
         }
 
-        .hero h1 {
-            margin: 0;
-            font-size: 2.5rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-        }
-        
-        .hero p {
-            font-size: 1.2rem;
-            margin-top: 10px;
-            opacity: 0.9;
-        }
+        .hero h1 { margin: 0; font-size: 2rem; text-transform: uppercase; letter-spacing: 2px; }
+        .hero p { font-size: 1.1rem; margin-top: 10px; opacity: 0.9; }
 
-        .timeline {
-            position: relative;
-            max-width: 1000px;
-            margin: 0 auto 50px auto;
-            padding: 0 20px;
-        }
+        /* --- VIEW CONTAINERS --- */
+        .view-section { display: none; padding: 20px; max-width: 800px; margin: 0 auto; }
+        .view-section.active { display: block; }
 
+        /* --- TIMELINE STYLES --- */
+        .timeline { position: relative; padding-bottom: 40px; }
         .timeline::after {
-            content: '';
-            position: absolute;
-            width: 4px;
+            content: ''; position: absolute; width: 4px; background-color: #ddd;
+            top: 0; bottom: 0; left: 50%; margin-left: -2px;
+        }
+
+        /* PAST EVENTS (Greying out) */
+        .container.past .content {
+            filter: grayscale(100%);
+            opacity: 0.6;
+        }
+        .container.past::after {
             background-color: #ddd;
-            top: 0;
-            bottom: 0;
-            left: 50%;
-            margin-left: -2px;
+            border-color: #999;
         }
 
-        .container {
-            padding: 10px 40px;
+        /* NOW MARKER */
+        .now-marker {
             position: relative;
-            width: 50%;
-            box-sizing: border-box;
+            text-align: center;
+            margin: 20px 0;
+            z-index: 20;
+            color: #e74c3c;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-
-        .left { left: 0; }
-        .right { left: 50%; }
-
-        .container::after {
+        .now-marker::before, .now-marker::after {
             content: '';
-            position: absolute;
-            width: 16px;
-            height: 16px;
-            right: -8px;
-            background-color: var(--card-bg);
-            border: 4px solid var(--accent-color);
-            top: 28px;
-            border-radius: 50%;
-            z-index: 10;
+            height: 2px;
+            background: #e74c3c;
+            flex-grow: 1;
+            margin: 0 10px;
         }
 
+        /* EXISTING CARD STYLES */
+        .container { padding: 10px 40px; position: relative; width: 50%; box-sizing: border-box; }
+        .left { left: 0; } .right { left: 50%; }
+        .container::after {
+            content: ''; position: absolute; width: 16px; height: 16px;
+            right: -8px; background-color: var(--card-bg); border: 4px solid var(--accent-color);
+            top: 28px; border-radius: 50%; z-index: 10;
+        }
         .right::after { left: -12px; }
 
         .content {
-            padding: 20px;
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-            cursor: pointer;
-            transition: transform 0.2s;
-            overflow: hidden;
-            border-left: 5px solid var(--accent-color);
+            padding: 20px; background-color: var(--card-bg); border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08); cursor: pointer;
+            border-left: 5px solid var(--accent-color); overflow: hidden;
         }
-
-        .content:hover { transform: translateY(-3px); }
-
         .card-header { display: flex; align-items: center; gap: 15px; }
+        .thumbnail { width: 50px; height: 50px; object-fit: cover; border-radius: 50%; flex-shrink: 0; }
+        .date-badge { background: var(--primary-color); color: white; padding: 3px 8px; border-radius: 10px; font-size: 0.7rem; }
+        h2 { margin: 0; font-size: 1.1rem; }
+        .location-link { color: var(--accent-color); text-decoration: none; font-size: 0.85rem; display: block; }
+        .details { max-height: 0; opacity: 0; transition: 0.4s ease; margin-top: 0; padding-top: 0; border-top: 1px solid transparent; }
+        .content.active .details { max-height: 500px; opacity: 1; margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; }
 
-        .thumbnail {
-            flex-shrink: 0; width: 60px; height: 60px;
-            object-fit: cover; border-radius: 50%; border: 2px solid #eee;
+        /* --- DAY VIEW STYLES --- */
+        .day-group { margin-bottom: 40px; }
+        .day-header {
+            background: #dfe6e9; padding: 10px 15px; border-radius: 8px;
+            font-weight: bold; color: var(--primary-color); margin-bottom: 15px;
+            position: sticky; top: 0; z-index: 5;
+        }
+        .day-card {
+            background: white; padding: 15px; margin-bottom: 15px;
+            border-radius: 8px; border-left: 4px solid var(--primary-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
-        .header-text { flex-grow: 1; min-width: 0; }
-
-        .date-badge {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-            font-weight: bold;
-            display: inline-block;
-            margin-bottom: 4px;
-        }
-
-        h2 { margin: 0; font-size: 1.1rem; color: #222; }
-
-        /* NEW: Map Link styling */
-        .location-link {
-            font-size: 0.85rem;
-            color: #e67e22;
-            text-decoration: none;
-            display: block;
-            margin-top: 4px;
-            font-weight: 600;
-        }
-        .location-link:hover { text-decoration: underline; }
-
-        .arrow-hint {
-            position: absolute; top: 20px; right: 20px; font-size: 12px; color: #aaa;
-        }
-
-        .details {
-            max-height: 0; opacity: 0; overflow: hidden;
-            transition: 0.4s ease; margin-top: 0;
-            color: #555; line-height: 1.6;
-        }
-
-        .content.active .details {
-            max-height: 500px; opacity: 1; margin-top: 15px;
-            padding-top: 15px; border-top: 1px solid #eee;
-        }
-
+        /* --- MOBILE TWEAKS --- */
         @media screen and (max-width: 768px) {
             .timeline::after { left: 30px; }
             .container { width: 100%; padding-left: 70px; padding-right: 0; }
             .left, .right { left: 0; }
             .container::after { left: 20px; }
-            .hero h1 { font-size: 1.8rem; }
+            .hero { padding: 30px 20px; }
         }
     </style>
 </head>
@@ -165,33 +161,60 @@
         <p>14 Days • Tokyo • Kyoto • Osaka</p>
     </div>
 
-    <div class="timeline" id="timeline-root"></div>
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="switchTab('timeline')">📅 Timeline</button>
+        <button class="tab-btn" onclick="switchTab('dayview')">☀️ Day View</button>
+    </div>
+
+    <div id="timeline" class="view-section active">
+        <div class="timeline" id="timeline-root"></div>
+    </div>
+
+    <div id="dayview" class="view-section">
+        <div id="dayview-root"></div>
+    </div>
 
     <script>
+        /* CONFIGURATION
+           IMPORTANT: 'isoDate' must be YYYY-MM-DDTHH:MM (24hr format) for the "Now" line to work.
+           'displayDate' is what the humans see.
+        */
         const itinerary = [
             {
-                date: "Aug 12 - 10:00 AM",
+                isoDate: "2026-08-12T10:00:00", 
+                displayDate: "Aug 12 - 10:00 AM",
                 title: "Flight to Tokyo",
                 location: "Heathrow Terminal 5",
                 image: "https://images.unsplash.com/photo-1542296332-2e44a996aa0d?w=150&h=150&fit=crop", 
                 details: "Flight BA007. Bring passports!"
             },
             {
-                date: "Aug 13 - 2:00 PM",
+                isoDate: "2026-08-13T14:00:00",
+                displayDate: "Aug 13 - 2:00 PM",
                 title: "Check-in at Hotel",
                 location: "Shinjuku Granbell Hotel",
                 image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=150&h=150&fit=crop",
-                details: "Rooms booked under 'Abbasi'."
+                details: "Rooms booked under 'Abbasi'. Wifi: granbell_guest"
             },
             {
-                date: "Aug 14 - 9:00 AM",
+                isoDate: "2026-08-14T09:00:00",
+                displayDate: "Aug 14 - 9:00 AM",
                 title: "TeamLab Planets",
                 location: "TeamLab Planets Toyosu",
                 image: "https://images.unsplash.com/photo-1534067783865-950339bc5ddb?w=150&h=150&fit=crop",
-                details: "Wear shorts!"
+                details: "Water museum. Wear shorts that roll up!"
             },
             {
-                date: "Aug 15 - 7:00 PM",
+                isoDate: "2026-08-14T13:00:00",
+                displayDate: "Aug 14 - 1:00 PM",
+                title: "Lunch at Toyosu Market",
+                location: "Sushi Dai",
+                image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=150&h=150&fit=crop",
+                details: "Best sushi in town. Expect a queue."
+            },
+            {
+                isoDate: "2026-08-15T19:00:00",
+                displayDate: "Aug 15 - 7:00 PM",
                 title: "Dinner with Auntie May",
                 location: "Gonpachi Nishiazabu",
                 image: "https://images.unsplash.com/photo-1514362545857-3bc16549766b?w=150&h=150&fit=crop",
@@ -199,41 +222,85 @@
             }
         ];
 
-        const root = document.getElementById('timeline-root');
+        // --- RENDER LOGIC ---
 
+        const now = new Date(); // Gets current computer time
+        const timelineRoot = document.getElementById('timeline-root');
+        const dayviewRoot = document.getElementById('dayview-root');
+        let nowMarkerPlaced = false;
+
+        // 1. Sort by date just in case
+        itinerary.sort((a, b) => new Date(a.isoDate) - new Date(b.isoDate));
+
+        // 2. Render Timeline
         itinerary.forEach((event, index) => {
+            const eventDate = new Date(event.isoDate);
+            const isPast = eventDate < now;
             const side = index % 2 === 0 ? 'left' : 'right';
+            const mapLink = `http://maps.google.com/?q=${encodeURIComponent(event.location)}`;
             
-            // Generate Google Maps Link automatically
-            const mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(event.location)}`;
+            // Logic to place the "NOW" line
+            if (!nowMarkerPlaced && eventDate > now) {
+                timelineRoot.insertAdjacentHTML('beforeend', `<div class="now-marker">CURRENT TIME</div>`);
+                nowMarkerPlaced = true;
+            }
 
             const html = `
-                <div class="container ${side}">
-                    <div class="content" onclick="toggleDetails(this)">
-                        <div class="arrow-hint">▼</div>
+                <div class="container ${side} ${isPast ? 'past' : ''}">
+                    <div class="content" onclick="this.classList.toggle('active')">
                         <div class="card-header">
-                            <img src="${event.image}" class="thumbnail" onerror="this.src='https://placehold.co/60x60?text=IMG'">
-                            <div class="header-text">
-                                <span class="date-badge">${event.date}</span>
+                            <img src="${event.image}" class="thumbnail" onerror="this.src='https://placehold.co/50'">
+                            <div>
+                                <span class="date-badge">${event.displayDate}</span>
                                 <h2>${event.title}</h2>
-                                <a href="${mapLink}" target="_blank" class="location-link" onclick="event.stopPropagation()">
-                                    📍 ${event.location}
-                                </a>
+                                <a href="${mapLink}" target="_blank" class="location-link" onclick="event.stopPropagation()">📍 ${event.location}</a>
                             </div>
                         </div>
-                        <div class="details">
-                            <p>${event.details}</p>
-                        </div>
+                        <div class="details"><p>${event.details}</p></div>
                     </div>
                 </div>
             `;
-            root.insertAdjacentHTML('beforeend', html);
+            timelineRoot.insertAdjacentHTML('beforeend', html);
         });
 
-        function toggleDetails(element) {
-            element.classList.toggle('active');
-            const arrow = element.querySelector('.arrow-hint');
-            arrow.textContent = element.classList.contains('active') ? '▲' : '▼';
+        // 3. Render Day View (Grouped)
+        const groups = {};
+        itinerary.forEach(event => {
+            // Group by "Aug 12" part of string
+            const dayKey = event.displayDate.split(' - ')[0]; 
+            if (!groups[dayKey]) groups[dayKey] = [];
+            groups[dayKey].push(event);
+        });
+
+        for (const [day, events] of Object.entries(groups)) {
+            let dayHtml = `<div class="day-group"><div class="day-header">${day}</div>`;
+            events.forEach(ev => {
+                dayHtml += `
+                    <div class="day-card">
+                        <div style="display:flex; justify-content:space-between;">
+                            <strong>${ev.title}</strong>
+                            <small>${ev.displayDate.split(' - ')[1] || ''}</small>
+                        </div>
+                        <div style="font-size:0.9rem; color:#666; margin-top:5px;">${ev.details}</div>
+                    </div>
+                `;
+            });
+            dayHtml += `</div>`;
+            dayviewRoot.insertAdjacentHTML('beforeend', dayHtml);
+        }
+
+        // --- TABS LOGIC ---
+        function switchTab(tabName) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            
+            if(tabName === 'timeline') {
+                document.getElementById('timeline').classList.add('active');
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+            } else {
+                document.getElementById('dayview').classList.add('active');
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+            }
         }
     </script>
 </body>
