@@ -18,7 +18,7 @@
             background-color: var(--bg-color);
             color: #333;
             margin: 0;
-            padding: 0 0 80px 0; /* Padding for bottom nav */
+            padding: 0 0 80px 0;
         }
 
         /* --- NAVIGATION TABS --- */
@@ -42,9 +42,9 @@
 
         /* --- HERO BANNER --- */
         .hero {
-            background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1200');
+            background: linear-gradient(rgba(0,0,0,0.5), rgba(0,0,0,0.5)), url('https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=1200');
             background-size: cover; background-position: center;
-            color: white; text-align: center; padding: 50px 20px;
+            color: white; text-align: center; padding: 60px 20px;
         }
         .hero h1 { margin: 0; font-size: 2rem; text-transform: uppercase; letter-spacing: 2px; }
         .hero p { font-size: 1.1rem; margin-top: 10px; opacity: 0.9; }
@@ -105,19 +105,16 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         
-        /* Major Events in Day View */
         .day-card {
             background: white; padding: 15px; margin-bottom: 15px;
             border-radius: 8px; border-left: 4px solid var(--primary-color);
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         
-        /* Minor Events (Lunch, etc) in Day View */
+        /* Minor Events */
         .day-card.minor {
-            background: #fff;
-            border-left: 4px solid #bdc3c7; /* Grey border instead of Blue */
-            margin-left: 20px; /* Indented slightly */
-            padding: 10px 15px;
+            background: #fff; border-left: 4px solid #bdc3c7;
+            margin-left: 20px; padding: 10px 15px;
         }
         .day-card.minor strong { font-weight: 500; color: #555; }
         .day-card.minor .sub-text { font-size: 0.85rem; color: #777; }
@@ -135,7 +132,7 @@
 
     <div class="hero">
         <h1>Abbasi Asia Trip 2026</h1>
-        <p>14 Days • Tokyo • Kyoto • Osaka</p>
+        <p>Malaysia • Singapore • Thailand</p>
     </div>
 
     <div class="nav-tabs">
@@ -152,69 +149,101 @@
     </div>
 
     <script>
-        /* HOW TO ADD MINOR DETAILS:
-           Add "onlyDayView: true" to the event object.
-           It will hide from the main Timeline but appear in the Day View.
+        /* DATA ENTRY
+           I have estimated 2026 dates and random times.
+           Update 'isoDate' with real times later to correct the order.
         */
         const itinerary = [
+            // --- DEPARTURE ---
             {
-                isoDate: "2026-08-12T10:00:00", 
-                displayDate: "Aug 12 - 10:00 AM",
-                title: "Flight to Tokyo",
-                location: "Heathrow Terminal 5",
-                image: "https://images.unsplash.com/photo-1542296332-2e44a996aa0d?w=150&h=150&fit=crop", 
-                details: "Flight BA007. Bring passports!"
+                isoDate: "2026-07-13T10:00:00", 
+                displayDate: "July 13",
+                title: "Fly to Kuala Lumpur",
+                location: "Departure Airport",
+                image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=150&h=150&fit=crop", 
+                details: "Departure day! Check passports and bags."
+            },
+            
+            // --- KUALA LUMPUR (14-16 July) ---
+            {
+                isoDate: "2026-07-14T14:00:00", 
+                displayDate: "July 14",
+                title: "Arrive in Malaysia",
+                location: "Kuala Lumpur (KUL)",
+                image: "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?w=150&h=150&fit=crop", 
+                details: "Start of the 3 night stay in KL. Head to hotel to check in."
             },
             {
-                // MINOR EVENT (Lunch)
                 onlyDayView: true,
-                isoDate: "2026-08-12T13:00:00",
-                displayDate: "Aug 12 - 1:00 PM",
-                title: "Airport Lunch",
-                location: "Gordon Ramsay Plane Food",
-                details: "Table booked for 4 people."
+                isoDate: "2026-07-14T16:00:00",
+                displayDate: "July 14",
+                title: "Check-in Hotel KL",
+                location: "Hotel Name TBC",
+                details: "Need to confirm booking reference."
+            },
+
+            // --- SINGAPORE (17-19 July) ---
+            {
+                isoDate: "2026-07-17T11:00:00", 
+                displayDate: "July 17",
+                title: "Fly to Singapore",
+                location: "Changi Airport",
+                image: "https://images.unsplash.com/photo-1565967511849-76a60a516170?w=150&h=150&fit=crop", 
+                details: "Short flight to Singapore. Stay for 2 nights."
             },
             {
-                isoDate: "2026-08-13T14:00:00",
-                displayDate: "Aug 13 - 2:00 PM",
-                title: "Check-in at Hotel",
-                location: "Shinjuku Granbell Hotel",
-                image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=150&h=150&fit=crop",
-                details: "Rooms booked under 'Abbasi'. Wifi: granbell_guest"
-            },
-            {
-                // MINOR EVENT (Quick Stop)
                 onlyDayView: true,
-                isoDate: "2026-08-13T16:00:00",
-                displayDate: "Aug 13 - 4:00 PM",
-                title: "Pick up Pocket Wifi",
-                location: "Hotel Lobby",
-                details: "The NinjaWifi counter is in the lobby."
+                isoDate: "2026-07-17T14:00:00",
+                displayDate: "July 17",
+                title: "Check-in Singapore",
+                location: "Hotel Name TBC",
+                details: "2 Nights stay."
+            },
+
+            // --- PHUKET (19-23 July) ---
+            {
+                isoDate: "2026-07-19T10:00:00", 
+                displayDate: "July 19",
+                title: "Fly to Phuket",
+                location: "Phuket International",
+                image: "https://images.unsplash.com/photo-1589394815804-964ed0be2eb5?w=150&h=150&fit=crop", 
+                details: "Heading to the beach! 5 Night stay."
             },
             {
-                isoDate: "2026-08-14T09:00:00",
-                displayDate: "Aug 14 - 9:00 AM",
-                title: "TeamLab Planets",
-                location: "TeamLab Planets Toyosu",
-                image: "https://images.unsplash.com/photo-1534067783865-950339bc5ddb?w=150&h=150&fit=crop",
-                details: "Water museum. Wear shorts that roll up!"
-            },
-            {
-                // MINOR EVENT (Lunch)
                 onlyDayView: true,
-                isoDate: "2026-08-14T13:00:00",
-                displayDate: "Aug 14 - 1:00 PM",
-                title: "Sushi Lunch",
-                location: "Sushi Dai",
-                details: "Best sushi in town. Expect a queue."
+                isoDate: "2026-07-19T15:00:00",
+                displayDate: "July 19",
+                title: "Check-in Resort",
+                location: "Resort Name TBC",
+                details: "Relax and unwind."
             },
+
+            // --- BANGKOK (24-26 July) ---
             {
-                isoDate: "2026-08-15T19:00:00",
-                displayDate: "Aug 15 - 7:00 PM",
-                title: "Dinner with Auntie May",
-                location: "Gonpachi Nishiazabu",
-                image: "https://images.unsplash.com/photo-1514362545857-3bc16549766b?w=150&h=150&fit=crop",
-                details: "Kill Bill restaurant."
+                isoDate: "2026-07-24T12:00:00", 
+                displayDate: "July 24",
+                title: "Fly to Bangkok",
+                location: "Suvarnabhumi Airport",
+                image: "https://images.unsplash.com/photo-1508009603885-50cf7c579365?w=150&h=150&fit=crop", 
+                details: "City break for the final leg."
+            },
+             {
+                onlyDayView: true,
+                isoDate: "2026-07-24T15:00:00",
+                displayDate: "July 24",
+                title: "Check-in Bangkok",
+                location: "Hotel Name TBC",
+                details: "2 Nights stay."
+            },
+
+            // --- HOME ---
+            {
+                isoDate: "2026-07-26T18:00:00", 
+                displayDate: "July 26",
+                title: "Fly Home",
+                location: "Airport",
+                image: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=150&h=150&fit=crop", 
+                details: "End of the trip. Safe travels!"
             }
         ];
 
@@ -224,18 +253,16 @@
         const dayviewRoot = document.getElementById('dayview-root');
         let nowMarkerPlaced = false;
 
-        // Sort by date so minor events slot in correctly
         itinerary.sort((a, b) => new Date(a.isoDate) - new Date(b.isoDate));
 
-        // 1. RENDER TIMELINE (Skipping minor events)
         let visibleCount = 0;
         itinerary.forEach((event) => {
-            if (event.onlyDayView) return; // SKIP MINOR EVENTS
+            if (event.onlyDayView) return; 
 
             const eventDate = new Date(event.isoDate);
             const isPast = eventDate < now;
             const side = visibleCount % 2 === 0 ? 'left' : 'right';
-            const mapLink = `http://googleusercontent.com/maps.google.com/3{encodeURIComponent(event.location)}`;
+            const mapLink = `https://maps.google.com/?q=${encodeURIComponent(event.location)}`;
             
             if (!nowMarkerPlaced && eventDate > now) {
                 timelineRoot.insertAdjacentHTML('beforeend', `<div class="now-marker">CURRENT TIME</div>`);
@@ -261,27 +288,23 @@
             visibleCount++;
         });
 
-        // 2. RENDER DAY VIEW (Including everything)
         const groups = {};
         itinerary.forEach(event => {
-            const dayKey = event.displayDate.split(' - ')[0]; // Group by "Aug 12"
+            const dayKey = event.displayDate.split(' - ')[0]; 
             if (!groups[dayKey]) groups[dayKey] = [];
             groups[dayKey].push(event);
         });
 
         for (const [day, events] of Object.entries(groups)) {
             let dayHtml = `<div class="day-group"><div class="day-header">${day}</div>`;
-            
             events.forEach(ev => {
-                // Check if minor or major
                 const isMinor = ev.onlyDayView ? 'minor' : '';
-                const mapLink = `http://googleusercontent.com/maps.google.com/4{encodeURIComponent(ev.location)}`;
-                
+                const mapLink = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(ev.location)}`;
                 dayHtml += `
                     <div class="day-card ${isMinor}">
                         <div style="display:flex; justify-content:space-between; align-items:center;">
                             <strong>${ev.title}</strong>
-                            <small class="sub-text">${ev.displayDate.split(' - ')[1] || ''}</small>
+                            <small class="sub-text">${ev.isoDate.split('T')[1].substring(0,5)}</small>
                         </div>
                         <div class="sub-text" style="margin-top:5px;">
                             <a href="${mapLink}" style="color:#e67e22; text-decoration:none;">📍 ${ev.location}</a>
@@ -298,7 +321,6 @@
         function switchTab(tabName) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
-            
             if(tabName === 'timeline') {
                 document.getElementById('timeline').classList.add('active');
                 document.querySelectorAll('.tab-btn')[0].classList.add('active');
