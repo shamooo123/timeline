@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Holiday Timeline</title>
+    <style>
+        /* --- VISUAL STYLING --- */
+        :root {
+            --primary-color: #2c3e50; /* Dark Blue */
+            --accent-color: #e67e22;  /* Orange */
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: #333;
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 60px;
+        }
+
+        /* The Timeline Container */
+        .timeline {
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* The Vertical Line */
+        .timeline::after {
+            content: '';
+            position: absolute;
+            width: 6px;
+            background-color: var(--primary-color);
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            margin-left: -3px;
+            border-radius: 3px;
+        }
+
+        /* Container for each event */
+        .container {
+            padding: 10px 40px;
+            position: relative;
+            background-color: inherit;
+            width: 50%;
+            box-sizing: border-box;
+        }
+
+        /* The dots on the timeline */
+        .container::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            right: -10px;
+            background-color: var(--card-bg);
+            border: 4px solid var(--accent-color);
+            top: 25px;
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        /* Positioning Left and Right */
+        .left { left: 0; }
+        .right { left: 50%; }
+        .left::after { right: -14px; }
+        .right::after { left: -16px; }
+
+        /* The Content Box */
+        .content {
+            padding: 20px;
+            background-color: var(--card-bg);
+            position: relative;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: transform 0.2s;
+            overflow: hidden;
+        }
+
+        .content:hover {
+            transform: translateY(-3px);
+        }
+
+        /* Header section of the card */
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .thumbnail {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 50%;
+            border: 2px solid var(--accent-color);
+        }
+
+        .date-badge {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+        h2 { margin: 0; font-size: 1.2rem; }
+        
+        /* The Expandable Details Section */
+        .details {
+            max-height: 0;
+            opacity: 0;
+            transition: max-height 0.4s ease-out, opacity 0.4s ease-out;
+            margin-top: 0;
+        }
+
+        /* Style when active/clicked */
+        .content.active .details {
+            max-height: 500px; /* Arbitrary large height */
+            opacity: 1;
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+        }
+
+        .arrow-hint {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* --- MOBILE RESPONSIVENESS --- */
+        @media screen and (max-width: 600px) {
+            .timeline::after { left: 31px; }
+            .container { width: 100%; padding-left: 70px; padding-right: 25px; }
+            .container::after { left: 21px; }
+            .left::after, .right::after { left: 17px; }
+            .right { left: 0%; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>✈️ The Family Holiday Timeline</h1>
+
+    <div class="timeline" id="timeline-root">
+        </div>
+
+    <script>
+        /* ================================================
+        1. EDIT YOUR EVENTS HERE
+        ================================================
+        Simply add or remove items inside the brackets [].
+        Keep the format: { ... },
+        */
+        
+        const itinerary = [
+            {
+                date: "Aug 12 - 10:00 AM",
+                title: "Flight to Tokyo",
+                location: "Heathrow T5",
+                image: "https://images.unsplash.com/photo-1542296332-2e44a996aa0d?w=150&h=150&fit=crop", 
+                details: "Flight BA007. Remember to bring passports and the printed visa documents! We are meeting at the check-in desk at 7:00 AM sharp."
+            },
+            {
+                date: "Aug 13 - 2:00 PM",
+                title: "Check-in at Hotel",
+                location: "Shinjuku Granbell",
+                image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=150&h=150&fit=crop",
+                details: "We have 3 rooms booked under 'Smith Family'. Wifi password usually on the TV. Time to nap or explore the 7-11 next door."
+            },
+            {
+                date: "Aug 14 - 9:00 AM",
+                title: "TeamLab Planets",
+                location: "Toyosu",
+                image: "https://images.unsplash.com/photo-1534067783865-950339bc5ddb?w=150&h=150&fit=crop",
+                details: "This is the water interactive museum. **Wear shorts that can roll up!** You will be barefoot."
+            },
+            {
+                date: "Aug 15 - 7:00 PM",
+                title: "Dinner with Auntie May",
+                location: "Gonpachi Nishiazabu",
+                image: "https://images.unsplash.com/photo-1514362545857-3bc16549766b?w=150&h=150&fit=crop",
+                details: "The 'Kill Bill' restaurant. Casual dress code. It is about 20 mins taxi from the hotel."
+            },
+            {
+                date: "Aug 18",
+                title: "Bullet Train to Kyoto",
+                location: "Tokyo Station",
+                image: "https://images.unsplash.com/photo-1532236395709-7d724888288d?w=150&h=150&fit=crop",
+                details: "We need to buy Bento boxes at the station before boarding. Do not be late, the train leaves exactly on time."
+            }
+        ];
+
+        /* ================================================
+        2. RENDERING LOGIC (Do not need to touch this)
+        ================================================
+        */
+        const root = document.getElementById('timeline-root');
+
+        itinerary.forEach((event, index) => {
+            // Determine left or right side
+            const side = index % 2 === 0 ? 'left' : 'right';
+
+            // Create HTML structure
+            const html = `
+                <div class="container ${side}">
+                    <div class="content" onclick="toggleDetails(this)">
+                        <div class="arrow-hint">▼ Click</div>
+                        <div class="card-header">
+                            <img src="${event.image}" alt="thumb" class="thumbnail">
+                            <div>
+                                <span class="date-badge">${event.date}</span>
+                                <h2>${event.title}</h2>
+                                <small style="color: #666">📍 ${event.location}</small>
+                            </div>
+                        </div>
+                        <div class="details">
+                            <p>${event.details}</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            root.insertAdjacentHTML('beforeend', html);
+        });
+
+        // Function to expand/collapse
+        function toggleDetails(element) {
+            element.classList.toggle('active');
+            const arrow = element.querySelector('.arrow-hint');
+            arrow.textContent = element.classList.contains('active') ? '▲ Close' : '▼ Click';
+        }
+    </script>
+</body>
+</html>
