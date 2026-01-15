@@ -21,29 +21,17 @@
             padding: 0 0 80px 0; /* Padding for bottom nav */
         }
 
-        /* --- NAVIGATION TABS (Fixed Bottom on Mobile) --- */
+        /* --- NAVIGATION TABS --- */
         .nav-tabs {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: white;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            z-index: 1000;
-            height: 60px;
+            position: fixed; bottom: 0; left: 0; width: 100%;
+            background: white; box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            display: flex; z-index: 1000; height: 60px;
         }
 
         .tab-btn {
-            flex: 1;
-            border: none;
-            background: none;
-            font-size: 1rem;
-            font-weight: bold;
-            color: #7f8c8d;
-            cursor: pointer;
-            border-top: 4px solid transparent;
-            transition: 0.3s;
+            flex: 1; border: none; background: none; font-size: 1rem;
+            font-weight: bold; color: #7f8c8d; cursor: pointer;
+            border-top: 4px solid transparent; transition: 0.3s;
         }
 
         .tab-btn.active {
@@ -55,17 +43,13 @@
         /* --- HERO BANNER --- */
         .hero {
             background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1200');
-            background-size: cover;
-            background-position: center;
-            color: white;
-            text-align: center;
-            padding: 50px 20px;
+            background-size: cover; background-position: center;
+            color: white; text-align: center; padding: 50px 20px;
         }
-
         .hero h1 { margin: 0; font-size: 2rem; text-transform: uppercase; letter-spacing: 2px; }
         .hero p { font-size: 1.1rem; margin-top: 10px; opacity: 0.9; }
 
-        /* --- VIEW CONTAINERS --- */
+        /* --- VIEWS --- */
         .view-section { display: none; padding: 20px; max-width: 800px; margin: 0 auto; }
         .view-section.active { display: block; }
 
@@ -76,39 +60,20 @@
             top: 0; bottom: 0; left: 50%; margin-left: -2px;
         }
 
-        /* PAST EVENTS (Greying out) */
-        .container.past .content {
-            filter: grayscale(100%);
-            opacity: 0.6;
-        }
-        .container.past::after {
-            background-color: #ddd;
-            border-color: #999;
-        }
-
-        /* NOW MARKER */
+        /* PAST & NOW STYLES */
+        .container.past .content { filter: grayscale(100%); opacity: 0.6; }
+        .container.past::after { background-color: #ddd; border-color: #999; }
+        
         .now-marker {
-            position: relative;
-            text-align: center;
-            margin: 20px 0;
-            z-index: 20;
-            color: #e74c3c;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            position: relative; text-align: center; margin: 20px 0; z-index: 20;
+            color: #e74c3c; font-weight: bold; text-transform: uppercase;
+            font-size: 0.9rem; display: flex; align-items: center; justify-content: center;
         }
         .now-marker::before, .now-marker::after {
-            content: '';
-            height: 2px;
-            background: #e74c3c;
-            flex-grow: 1;
-            margin: 0 10px;
+            content: ''; height: 2px; background: #e74c3c; flex-grow: 1; margin: 0 10px;
         }
 
-        /* EXISTING CARD STYLES */
+        /* CARD STYLES */
         .container { padding: 10px 40px; position: relative; width: 50%; box-sizing: border-box; }
         .left { left: 0; } .right { left: 50%; }
         .container::after {
@@ -137,14 +102,26 @@
             background: #dfe6e9; padding: 10px 15px; border-radius: 8px;
             font-weight: bold; color: var(--primary-color); margin-bottom: 15px;
             position: sticky; top: 0; z-index: 5;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
+        
+        /* Major Events in Day View */
         .day-card {
             background: white; padding: 15px; margin-bottom: 15px;
             border-radius: 8px; border-left: 4px solid var(--primary-color);
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
+        
+        /* Minor Events (Lunch, etc) in Day View */
+        .day-card.minor {
+            background: #fff;
+            border-left: 4px solid #bdc3c7; /* Grey border instead of Blue */
+            margin-left: 20px; /* Indented slightly */
+            padding: 10px 15px;
+        }
+        .day-card.minor strong { font-weight: 500; color: #555; }
+        .day-card.minor .sub-text { font-size: 0.85rem; color: #777; }
 
-        /* --- MOBILE TWEAKS --- */
         @media screen and (max-width: 768px) {
             .timeline::after { left: 30px; }
             .container { width: 100%; padding-left: 70px; padding-right: 0; }
@@ -175,9 +152,9 @@
     </div>
 
     <script>
-        /* CONFIGURATION
-           IMPORTANT: 'isoDate' must be YYYY-MM-DDTHH:MM (24hr format) for the "Now" line to work.
-           'displayDate' is what the humans see.
+        /* HOW TO ADD MINOR DETAILS:
+           Add "onlyDayView: true" to the event object.
+           It will hide from the main Timeline but appear in the Day View.
         */
         const itinerary = [
             {
@@ -189,12 +166,30 @@
                 details: "Flight BA007. Bring passports!"
             },
             {
+                // MINOR EVENT (Lunch)
+                onlyDayView: true,
+                isoDate: "2026-08-12T13:00:00",
+                displayDate: "Aug 12 - 1:00 PM",
+                title: "Airport Lunch",
+                location: "Gordon Ramsay Plane Food",
+                details: "Table booked for 4 people."
+            },
+            {
                 isoDate: "2026-08-13T14:00:00",
                 displayDate: "Aug 13 - 2:00 PM",
                 title: "Check-in at Hotel",
                 location: "Shinjuku Granbell Hotel",
                 image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=150&h=150&fit=crop",
                 details: "Rooms booked under 'Abbasi'. Wifi: granbell_guest"
+            },
+            {
+                // MINOR EVENT (Quick Stop)
+                onlyDayView: true,
+                isoDate: "2026-08-13T16:00:00",
+                displayDate: "Aug 13 - 4:00 PM",
+                title: "Pick up Pocket Wifi",
+                location: "Hotel Lobby",
+                details: "The NinjaWifi counter is in the lobby."
             },
             {
                 isoDate: "2026-08-14T09:00:00",
@@ -205,11 +200,12 @@
                 details: "Water museum. Wear shorts that roll up!"
             },
             {
+                // MINOR EVENT (Lunch)
+                onlyDayView: true,
                 isoDate: "2026-08-14T13:00:00",
                 displayDate: "Aug 14 - 1:00 PM",
-                title: "Lunch at Toyosu Market",
+                title: "Sushi Lunch",
                 location: "Sushi Dai",
-                image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=150&h=150&fit=crop",
                 details: "Best sushi in town. Expect a queue."
             },
             {
@@ -223,23 +219,24 @@
         ];
 
         // --- RENDER LOGIC ---
-
-        const now = new Date(); // Gets current computer time
+        const now = new Date();
         const timelineRoot = document.getElementById('timeline-root');
         const dayviewRoot = document.getElementById('dayview-root');
         let nowMarkerPlaced = false;
 
-        // 1. Sort by date just in case
+        // Sort by date so minor events slot in correctly
         itinerary.sort((a, b) => new Date(a.isoDate) - new Date(b.isoDate));
 
-        // 2. Render Timeline
-        itinerary.forEach((event, index) => {
+        // 1. RENDER TIMELINE (Skipping minor events)
+        let visibleCount = 0;
+        itinerary.forEach((event) => {
+            if (event.onlyDayView) return; // SKIP MINOR EVENTS
+
             const eventDate = new Date(event.isoDate);
             const isPast = eventDate < now;
-            const side = index % 2 === 0 ? 'left' : 'right';
-            const mapLink = `http://maps.google.com/?q=${encodeURIComponent(event.location)}`;
+            const side = visibleCount % 2 === 0 ? 'left' : 'right';
+            const mapLink = `http://googleusercontent.com/maps.google.com/3{encodeURIComponent(event.location)}`;
             
-            // Logic to place the "NOW" line
             if (!nowMarkerPlaced && eventDate > now) {
                 timelineRoot.insertAdjacentHTML('beforeend', `<div class="now-marker">CURRENT TIME</div>`);
                 nowMarkerPlaced = true;
@@ -261,27 +258,36 @@
                 </div>
             `;
             timelineRoot.insertAdjacentHTML('beforeend', html);
+            visibleCount++;
         });
 
-        // 3. Render Day View (Grouped)
+        // 2. RENDER DAY VIEW (Including everything)
         const groups = {};
         itinerary.forEach(event => {
-            // Group by "Aug 12" part of string
-            const dayKey = event.displayDate.split(' - ')[0]; 
+            const dayKey = event.displayDate.split(' - ')[0]; // Group by "Aug 12"
             if (!groups[dayKey]) groups[dayKey] = [];
             groups[dayKey].push(event);
         });
 
         for (const [day, events] of Object.entries(groups)) {
             let dayHtml = `<div class="day-group"><div class="day-header">${day}</div>`;
+            
             events.forEach(ev => {
+                // Check if minor or major
+                const isMinor = ev.onlyDayView ? 'minor' : '';
+                const mapLink = `http://googleusercontent.com/maps.google.com/4{encodeURIComponent(ev.location)}`;
+                
                 dayHtml += `
-                    <div class="day-card">
-                        <div style="display:flex; justify-content:space-between;">
+                    <div class="day-card ${isMinor}">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
                             <strong>${ev.title}</strong>
-                            <small>${ev.displayDate.split(' - ')[1] || ''}</small>
+                            <small class="sub-text">${ev.displayDate.split(' - ')[1] || ''}</small>
                         </div>
-                        <div style="font-size:0.9rem; color:#666; margin-top:5px;">${ev.details}</div>
+                        <div class="sub-text" style="margin-top:5px;">
+                            <a href="${mapLink}" style="color:#e67e22; text-decoration:none;">📍 ${ev.location}</a>
+                            <br>
+                            ${ev.details}
+                        </div>
                     </div>
                 `;
             });
@@ -289,7 +295,6 @@
             dayviewRoot.insertAdjacentHTML('beforeend', dayHtml);
         }
 
-        // --- TABS LOGIC ---
         function switchTab(tabName) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
